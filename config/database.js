@@ -10,6 +10,27 @@ module.exports = ({ env }) => ({
       ssl: {
         rejectUnauthorized: false
       },
+      pool: {
+        min: 0,
+        max: 5,
+        acquireTimeoutMillis: 60000,
+        createTimeoutMillis: 30000,
+        idleTimeoutMillis: 30000,
+        reapIntervalMillis: 1000,
+        createRetryIntervalMillis: 100,
+      },
+    },
+    acquireConnectionTimeout: 60000,
+    debug: env.bool('DATABASE_DEBUG', false),
+    pool: {
+      afterCreate: (conn, done) => {
+        conn.query('SET timezone="UTC";', (err) => {
+          if (err) {
+            console.error(err);
+          }
+          done(err, conn);
+        });
+      },
     },
   },
 });
